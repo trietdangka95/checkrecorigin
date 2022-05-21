@@ -13,7 +13,13 @@ const router = createRouter({
     {
       path: '/detail',
       name: 'detail',
-      component: DetailView
+      component: DetailView,
+      children: [
+        { 
+          path: ':recId',
+          component: DetailView,
+        }
+      ]
     }
   ]
 })
