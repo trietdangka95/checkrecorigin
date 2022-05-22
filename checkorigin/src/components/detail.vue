@@ -19,7 +19,7 @@
       <div class="header-detail row">
         <div class="col-3">
           <p>Project Name</p>
-          <b>T-RECSolarINSSRE1</b>
+          <b>{{ dataRec }}</b>
         </div>
         <div class="line"></div>
         <div class="col-2">
@@ -96,7 +96,12 @@
   </div>
 </template>
 <script setup>
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { url } from "../../constant/config";
+
+const route = useRoute();
+
 async function getData(url = "", assetId) {
   const response = await fetch(url + assetId, {
     method: "GET",
@@ -112,15 +117,9 @@ async function getData(url = "", assetId) {
   return response.json();
 }
 
-// getData("https://devtrade.trecs.ai/tigrs/", assetId)
-//     .then((data) => {
-//     console.log("Success:", data);
-//     })
-//     .catch((error) => {
-//     console.error("Error:", error);
-//     });
 onMounted(async () => {
-  await getData();
+  const dataRec = await getData(url, route.query.id);
+  console.log(dataRec.data);
 });
 </script>
 

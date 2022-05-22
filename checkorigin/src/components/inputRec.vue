@@ -38,13 +38,18 @@ const validateRec = (recId) => {
 const handleCheckRec = () => {
   const recIdArr = recId.value.split("-");
   const assetId = recIdArr[1];
-  isInvalid.value = validateRec(recIdArr);
-  if (!isInvalid.value) {
-    router.push({
-      name: "detail",
-      query: { recId: "TIGR-1177-MY-04-10-2020-3048-145" },
-    });
-  }
+  router.push({
+    name: "detail",
+    query: { id: assetId },
+  });
+  // const recIdArr = recId.value.split("-");
+  // isInvalid.value = validateRec(recIdArr);
+  // if (!isInvalid.value) {
+  //   router.push({
+  //     name: "detail",
+  //     query: { id: recId.value },
+  //   });
+  // }
 
   //TIGR-1177-MY-04-10-2020-3048-145
 };

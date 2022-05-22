@@ -16,7 +16,7 @@ const router = createRouter({
       component: DetailView,
       children: [
         { 
-          path: ':recId',
+          path: ':id',
           component: DetailView,
         }
       ]
