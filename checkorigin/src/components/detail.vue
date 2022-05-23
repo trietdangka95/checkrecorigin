@@ -19,28 +19,36 @@
       <div class="header-detail row">
         <div class="col-3">
           <p>Project Name</p>
-          <b>{{ dataRec }}</b>
+          <b>{{ finalData.name }}</b>
         </div>
         <div class="line"></div>
         <div class="col-2">
           <p>Asset ID</p>
-          <b>GEN1234</b>
+          <b>{{ finalData.id }}</b>
         </div>
         <div class="line"></div>
         <div class="col-3">
           <p>Asset Type</p>
-          <b>Solar Energy REC</b>
+          <b>{{ finalData.technology }}</b>
         </div>
         <div class="line"></div>
         <div class="col-3">
-          <p>Loacation (2.292938, 102.342703)</p>
-          <b>Rajasthan, India</b>
+          <p>
+            {{ `Loacation (${finalData.latitude}, ${finalData.longitude})` }}
+          </p>
+          <b>{{ `${finalData.region} , ${finalData.country}` }}</b>
         </div>
       </div>
 
       <div class="body-detail row">
         <div class="col-5 left-detail">
-          <img src="../assets/images/Wind-big.png" class="row img1" alt="" />
+          <img
+            :src="`../src/assets/images/${
+              finalData.technology.split(' ')[0]
+            }-big.png`"
+            class="row img1"
+            alt=""
+          />
           <img src="../assets/images/Biomass-Big.png" class="row img2" alt="" />
         </div>
         <div class="col-3 detail-rec">
@@ -50,7 +58,7 @@
           </div>
           <div class="row">
             <p>Project Online Date</p>
-            <b>Feb 11, 2013</b>
+            <b>{{ finalData.onlineDate }}</b>
           </div>
           <div class="row">
             <p>Date of REC Generation</p>
@@ -58,23 +66,18 @@
           </div>
           <div class="row">
             <p>Nameplate Capacity</p>
-            <b>20 MW</b>
+            <b>{{ finalData.nameplateCapacity }} MW</b>
           </div>
           <div class="row">
             <p>Estimated Annual Generation</p>
-            <b>9835 MWh</b>
+            <b>{{ finalData.estimatedAnnualMwhs }} MWh</b>
           </div>
         </div>
         <div class="col-4">
           <div class="description row">
             <b style="margin-top: 10px">Asset Description:</b>
             <p>
-              GKSB Solar PV Farm is located in Melaka, Malaysia. It consists of
-              Yingli Solar, Hanwha Q Cells and JA Solars panels. The solar farm
-              is using EDMI Mk6E for metering. EDMI MK6E is a high-precision
-              meter created for generation and transmission applications, as
-              well as for revenue metering at high-end consumer facilities. The
-              power plant is connected to grid.
+              {{ finalData.description }}
             </p>
           </div>
           <div class="certification row">
@@ -96,13 +99,16 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useRoute } from "vue-router";
 import { url } from "../../constant/config";
 
 const route = useRoute();
+const finalData = ref("");
+const recIdArr = route.query.id.split("-");
 
-async function getData(url = "", assetId) {
+const assetId = recIdArr[1];
+async function getData() {
   const response = await fetch(url + assetId, {
     method: "GET",
     mode: "cors",
@@ -115,12 +121,17 @@ async function getData(url = "", assetId) {
     referrerPolicy: "no-referrer",
   });
   return response.json();
+  // data = data.concat(response.json());
 }
-
-onMounted(async () => {
-  const dataRec = await getData(url, route.query.id);
-  console.log(dataRec.data);
+const data = getData();
+const dataAll = data.then((result) => {
+  finalData.value = result.data;
+  console.log(finalData.value);
 });
+
+// onMounted(() => {
+//   getData();
+// });
 </script>
 
 <style scoped>
@@ -197,6 +208,7 @@ p {
 }
 
 .detail-rec > div {
+  display: block;
   width: 55vh;
   height: 10vh;
   background: #ffffff;
@@ -230,7 +242,8 @@ p {
 
 .description {
   width: 55vh;
-  height: 35vh;
+  height: auto;
+  padding-bottom: 15px;
   margin-bottom: 10px;
   background: #ffffff;
   border: 1px solid #e8e8e8;

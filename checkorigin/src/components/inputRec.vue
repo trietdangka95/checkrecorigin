@@ -18,41 +18,62 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { url } from "../../constant/config";
 const router = useRouter();
 const recId = ref("");
 const isInvalid = ref(false);
-const validateRec = (recId) => {
+const finalData = ref("");
+const error = ref("");
+const validateRec = async (recId) => {
   if (
-    recId == "" ||
-    recId.split("-").length < 8 ||
-    (recId.split("-")[0] !== "TIGR" && recId.split("-")[0] !== "IREC") ||
-    parseInt(recId.split("-")[4]) < 0 ||
-    parseInt(recId.split("-")[4]) > 12 ||
-    parseInt(recId.split("-")[5] < 1980) ||
-    parseInt(recId.split("-")[5]) > new Date().getFullYear()
+    recId.length < 8 ||
+    parseInt(recId[4]) < 0 ||
+    parseInt(recId[4]) > 12 ||
+    parseInt(recId[5] < 1980) ||
+    parseInt(recId[5]) > new Date().getFullYear()
   ) {
-    return true;
+    isInvalid.value = true;
+  } else {
+    await getData(url, recId[1]);
+    if (!finalData.value.success) {
+      isInvalid.value = true;
+    } else {
+      isInvalid.value = false;
+    }
   }
-  return false;
 };
-const handleCheckRec = () => {
+const handleCheckRec = async () => {
   const recIdArr = recId.value.split("-");
-  const assetId = recIdArr[1];
-  router.push({
-    name: "detail",
-    query: { id: assetId },
-  });
-  // const recIdArr = recId.value.split("-");
-  // isInvalid.value = validateRec(recIdArr);
-  // if (!isInvalid.value) {
-  //   router.push({
-  //     name: "detail",
-  //     query: { id: recId.value },
-  //   });
-  // }
+  validateRec(recIdArr);
+  console.log(isInvalid.value);
+  if (!isInvalid.value)
+    router.push({
+      name: "detail",
+      query: { id: recId.value },
+    });
 
   //TIGR-1177-MY-04-10-2020-3048-145
 };
+async function getData(url, assetId) {
+  await fetch(url + assetId, {
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+  })
+    .then(async (response) => {
+      finalData.value = await response.json();
+      if (!response.ok) {
+        isInvalid.value = true;
+      }
+    })
+    .catch((error) => console.log(error));
+}
 </script>
 
 <style scoped>
